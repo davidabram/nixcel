@@ -1,0 +1,22 @@
+module(name = "nixcel-nonsense")
+
+bazel_dep(name = "rules_oci", version = "2.0.0")
+bazel_dep(name = "bazel_skylib", version = "1.5.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.4.1")
+bazel_dep(name = "platforms", version = "0.0.10")
+bazel_dep(name = "rules_nixpkgs_core", version = "0.13.0")
+
+nix_repo = use_extension("@rules_nixpkgs_core//extensions:repository.bzl", "nix_repo")
+nix_repo.default(
+    name = "nixpkgs",
+)
+use_repo(nix_repo, "nixpkgs")
+
+nix_pkg = use_extension("@rules_nixpkgs_core//extensions:package.bzl", "nix_pkg")
+nix_pkg.file(
+    attr = "myImage",
+    name = "nix_stream_image",
+    file = "//nix:image.nix",
+    repo = "@nixpkgs",
+)
+use_repo(nix_pkg, "nix_stream_image")

@@ -1,0 +1,29 @@
+load("//tools/oci:oci_unpack_rule.bzl", "unpack_nix_image")
+
+unpack_nix_image(
+    name = "nix_base_oci",
+    generator_script = "@nix_stream_image//:bin/stream-layered-image",
+)
+
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_load")
+
+oci_load(
+    name = "nix_base_tarball",
+    image = ":nix_base_oci",
+    repo_tags = ["nixcel-base:latest"],
+)
+
+oci_image(
+    name = "next_image",
+    base = ":nix_base_oci",
+    tars = ["//:next_build"],
+    entrypoint = ["/app/start.sh"],
+    workdir = "/app",
+)
+
+oci_load(
+    name = "next_image_tarball",
+    image = ":next_image",
+    repo_tags = ["nixcel-nonsense:latest"],
+)
+

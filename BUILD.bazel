@@ -1,0 +1,48 @@
+genrule(
+    name = "next_build",
+    srcs = [
+        "pages/index.tsx",
+        "package.json",
+        "tsconfig.json",
+        "pnpm-lock.yaml",
+        "next-env.d.ts",
+    ],
+    outs = ["next_build.tar"],
+    cmd = """
+        set -e
+        
+        OUTPUT_FILE=$$(realpath $@)
+        BUILD_DIR=$$(mktemp -d)
+        trap "rm -rf $$BUILD_DIR" EXIT
+        
+        cp $(location package.json) $$BUILD_DIR/
+        cp $(location tsconfig.json) $$BUILD_DIR/
+        cp $(location pnpm-lock.yaml) $$BUILD_DIR/
+        cp $(location next-env.d.ts) $$BUILD_DIR/
+        
+        mkdir -p $$BUILD_DIR/pages
+        cp $(location pages/index.tsx) $$BUILD_DIR/pages/
+        
+        cd $$BUILD_DIR
+        
+        pnpm install --frozen-lockfile
+        pnpm build
+        
+        mkdir -p app
+        mv .next app/
+        cp package.json app/
+        mv node_modules app/
+        
+        cat > app/start.sh <<'STARTSCRIPT'
+#!/bin/sh
+cd /app
+exec sh node_modules/.bin/next start
+STARTSCRIPT
+        chmod +x app/start.sh
+        
+        tar -czf $$OUTPUT_FILE -C . app
+    """,
+    tags = ["no-sandbox", "no-cache"],
+    visibility = ["//visibility:public"],
+)
+

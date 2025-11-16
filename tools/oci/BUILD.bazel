@@ -1,0 +1,2 @@
+exports_files(["docker_to_oci.sh"])
+

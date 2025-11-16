@@ -1,0 +1,3 @@
+build --shell_executable=/etc/profiles/per-user/davidabram/bin/bash
+build --action_env=PATH
+test --action_env=PATH
