@@ -1,7 +1,7 @@
 let
   pkgs = import <nixpkgs> {};
   docker = pkgs.dockerTools;
-  
+
   streamScript = docker.streamLayeredImage {
     name = "nix-base";
     contents = [

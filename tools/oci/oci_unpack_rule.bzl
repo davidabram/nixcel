@@ -1,7 +1,6 @@
 def _unpack_nix_image_impl(ctx):
     output_dir = ctx.actions.declare_directory("layout")
 
-    # Create a wrapper script that will be executed
     wrapper = ctx.actions.declare_file(ctx.label.name + "_wrapper.sh")
     ctx.actions.write(
         output = wrapper,
